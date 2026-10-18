@@ -4,6 +4,7 @@
 #include "qtwasmtestlib.h"
 
 #include <QtCore/qmetaobject.h>
+#include <QtCore/private/qstdweb_p.h>
 
 #include <emscripten/bind.h>
 #include <emscripten.h>
@@ -127,7 +128,7 @@ void passTest()
 EMSCRIPTEN_BINDINGS(qtwebtestrunner) {
     emscripten::function("cleanupTestCase", &cleanupTestCase);
     emscripten::function("getTestFunctions", &getTestFunctions);
-    emscripten::function("runTestFunction", &runTestFunction);
+    emscripten::function("runTestFunction", &runTestFunction QT_WASM_EMSCRIPTEN_ASYNC);
     emscripten::function("qtWasmFail", &failTest);
     emscripten::function("qtWasmPass", &passTest);
 }
