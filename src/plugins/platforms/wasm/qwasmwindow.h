@@ -68,6 +68,7 @@ public:
     bool onNonClientEvent(const PointerEvent &event);
 
     // QPlatformWindow:
+    bool isForeignWindow() const override { return m_isForeignWindow; }
     void initialize() override;
     void setGeometry(const QRect &) override;
     void setVisible(bool visible) override;
@@ -216,6 +217,7 @@ private:
     QPoint m_lastPointerMovePoint;
 
     WId m_winId = 0;
+    bool m_isForeignWindow = false;
     bool m_wantCapture = false;
     bool m_hasTitle = false;
     bool m_needsCompositor = false;

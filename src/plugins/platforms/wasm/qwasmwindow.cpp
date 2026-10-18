@@ -72,6 +72,7 @@ QWasmWindow::QWasmWindow(QWindow *w, QWasmDeadKeySupport *deadKeySupport,
     // implementation detail. The pointer will be dereferenced again if the window is destroyed
     // and recreated.
     if (nativeHandle) {
+        m_isForeignWindow = true;
         m_window = *(emscripten::val *)(nativeHandle);
         m_winId = nativeHandle;
         m_decoratedWindow.set("id", "qt-window-" + std::to_string(m_winId));
@@ -245,9 +246,11 @@ QWasmWindow::~QWasmWindow()
 
     shutdown();
 
-    emscripten::val::module_property("specialHTMLTargets").delete_(canvasSelector());
-    m_window.call<void>("removeChild", m_canvas);
-    m_window.call<void>("removeChild", m_a11yContainer);
+    if (!isForeignWindow()) {
+        emscripten::val::module_property("specialHTMLTargets").delete_(canvasSelector());
+        m_window.call<void>("removeChild", m_canvas);
+        m_window.call<void>("removeChild", m_a11yContainer);
+    }
     m_context2d = emscripten::val::undefined();
     commitParent(nullptr);
     if (m_requestAnimationFrameId > -1)
