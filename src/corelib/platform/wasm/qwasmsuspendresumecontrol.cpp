@@ -65,9 +65,28 @@ EM_ASYNC_JS(void, qtSuspendJs, (), {
 // The wasm instance will then call the C++ event after it is resumed.
 void qtRegisterEventHandlerJs(int index) {
     EM_ASM({
+        function snapshotEvent(event) {
+            if (!(event instanceof Event))
+                return event;
+
+            const copy = { isInstanceOfEvent: true };
+            for (const key in event) {
+                const value = event[key];
+                copy[key] = typeof value === 'function' ? value.bind(event) : value;
+            }
+
+            // Qt 6.10 also reads the event class and dispatch path when processing input.
+            copy.constructor = event.constructor;
+            const path = event.composedPath();
+            copy.composedPath = () => path.slice();
+            return copy;
+        }
+
         let index = $0;
         let control = Module.qtSuspendResumeControl;
         let handler = (arg) => {
+            // DOM event targets and paths can be cleared after browser dispatch.
+            arg = snapshotEvent(arg);
 
             // Add event to event queue
             control.pendingEvents.push({
