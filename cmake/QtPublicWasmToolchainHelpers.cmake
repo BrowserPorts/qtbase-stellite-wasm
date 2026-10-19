@@ -24,7 +24,9 @@ endfunction()
 
 function(__qt_internal_query_emsdk_version emroot_path is_fatal out_var)
     # get emscripten version
-    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    if(EMSCRIPTEN AND CMAKE_C_COMPILER)
+        set(EXECUTE_COMMANDPATH "${CMAKE_C_COMPILER}")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         set(EXECUTE_COMMANDPATH "$ENV{EMSDK}/${emroot_path}/emcc.bat")
     else()
         set(EXECUTE_COMMANDPATH "$ENV{EMSDK}/${emroot_path}/emcc")
