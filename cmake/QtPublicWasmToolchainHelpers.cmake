@@ -26,6 +26,12 @@ function(__qt_internal_query_emsdk_version emroot_path is_fatal out_var)
     # get emscripten version
     if(EMSCRIPTEN AND CMAKE_C_COMPILER)
         set(EXECUTE_COMMANDPATH "${CMAKE_C_COMPILER}")
+    elseif(EMSCRIPTEN_ROOT_PATH)
+        # Qt also probes before project() loads the custom toolchain.
+        set(EXECUTE_COMMANDPATH "${EMSCRIPTEN_ROOT_PATH}/emcc")
+        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+            string(APPEND EXECUTE_COMMANDPATH ".bat")
+        endif()
     elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         set(EXECUTE_COMMANDPATH "$ENV{EMSDK}/${emroot_path}/emcc.bat")
     else()
